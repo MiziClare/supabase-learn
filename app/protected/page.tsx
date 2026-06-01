@@ -10,19 +10,24 @@ async function UserDetails() {
   // 创建一个 Supabase 客户端。这个客户端会自动从环境变量中读取 Supabase 的 URL 和匿名密钥
   // await 的意思是“等它创建完成再往下走”（先拿到一个可以跟 Supabase 说话的工具）
   const supabase = await createClient();
+
   // 向 Supabase 查询当前用户的 claims 信息。这个信息里会包含用户的 ID、邮箱等数据。如果查询失败了（比如用户没有登录），就会有一个 error 对象
   const { data, error } = await supabase.auth.getClaims();
 
   // 如果有错误，或者 data 不存在或 data 里面没有 claims（为空或未定义）
   if (error || !data?.claims) {
-    redirect("/auth/login"); // 就把用户重定向到登录页面，让他们先登录
+    redirect("/auth/login"); // 就把用户重定向到登录页面（来自 next/navigation），让他们先登录
   }
 
   // 如果没有错误，并且 data.claims 存在，就把 claims 对象转换成一个格式化的 JSON 字符串，显示在页面上。
   // 后面的 null, 2 是格式化参数，表示缩进 2 个空格，让输出更易读。
+  // 即若符合条件，UserDetails() 返回格式化的 JSON，这个字符串会被渲染在页面的 <pre> 区域里
   return JSON.stringify(data.claims, null, 2);
 }
 
+// ProtectedPage 在渲染时会调用异步函数 UserDetails()
+// UserDetails 在服务器端执行并检查登录状态
+// 在 HTML 生成前拦截: 因为 UserDetails() 是在服务端渲染阶段运行，redirect() 会在返回最终页面前发生，所以未登录者不会收到包含受保护内容的 HTML。
 export default function ProtectedPage() {
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
