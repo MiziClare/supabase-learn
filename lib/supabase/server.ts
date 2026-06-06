@@ -18,6 +18,7 @@ import { cookies } from "next/headers";
 // 导出一个异步函数 createClient，供页面或 API 在服务器端创建 Supabase 客户端并把当前请求的 cookie 传入。
 // 作用：在每次服务器端渲染或 API 调用时，创建一个 Supabase 客户端，并把当前请求的 cookie（包含 Supabase 的 session token）交给 SDK，让 SDK 能基于这些 cookie 验证用户、读取/刷新会话
 export async function createClient() {
+  
   // 调用 Next.js 的 cookies() 获取当前请求/响应上下文的 cookie 存取对象（可以读取该请求携带的所有 cookie）。
   // 即获取【当前这一个请求】的专属 Cookie
   const cookieStore = await cookies();
